@@ -20,6 +20,7 @@ export interface Callbacks extends GenerateFramesCallbacks, OcrCallbacks {}
 
 export enum OutputFormat {
     Json = 'json',
+    Txt = 'txt',
 }
 
 export interface OutputOptions {

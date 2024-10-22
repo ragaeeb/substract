@@ -15,7 +15,7 @@ export const ocrWithAppleEngine = async (frames: Frame[], options: AppleOcrOptio
         await options.callbacks?.onOcrStarted(frames);
     }
 
-    const ocrPromises = frames.map((frame, i) =>
+    const ocrPromises = frames.map((frame, i, arr) =>
         limit(async () => {
             try {
                 const { stderr, stdout } = await execFileAsync(options.binaryPath, [
@@ -35,6 +35,8 @@ export const ocrWithAppleEngine = async (frames: Frame[], options: AppleOcrOptio
                 logger.error(`Error processing frame ${frame.filename}:`, error);
                 return { start: frame.start, text: null };
             } finally {
+                logger.debug(`${i}/${arr.length} OCR completed`);
+
                 if (options.callbacks?.onOcrProgress) {
                     options.callbacks?.onOcrProgress(frame, i);
                 }

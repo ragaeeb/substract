@@ -5,6 +5,7 @@ import { ocrWithAppleEngine } from './ocr/apple.js';
 import { SubstractOptions } from './types.js';
 import { createTempDir } from './utils/io.js';
 import logger from './utils/logger.js';
+import { writeOcrResults } from './utils/outputWriter.js';
 import { filterOutDuplicateFrames, filterOutDuplicates } from './utils/postProcessing.js';
 
 export const substract = async (videoFile: string, options: SubstractOptions): Promise<null | string> => {
@@ -52,9 +53,9 @@ export const substract = async (videoFile: string, options: SubstractOptions): P
 
         result = filterOutDuplicates(result, options.duplicateTextThreshold);
 
-        await fs.writeFile(options.outputOptions.outputFile, JSON.stringify(result, null, 2));
+        const outputFile = await writeOcrResults(result, options.outputOptions);
 
-        return options.outputOptions.outputFile;
+        return outputFile;
     } finally {
         await fs.rm(outputFolder, { recursive: true });
     }
