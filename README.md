@@ -64,7 +64,7 @@ const outputFile = 'path/to/output.json';
 
 const options = {
     ocrOptions: {
-        appleBinaryPath: '/path/to/ocr/binary',
+        appleBinaryPath: '/path/to/ocr/binary', // you can get this from https://github.com/glowinthedark/macOCR
     },
     outputOptions: {
         outputFile,
@@ -177,3 +177,7 @@ Substract provides several callbacks to monitor and control the extraction proce
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
+
+## Acknowledgements
+
+The Apple OCR method requires the build of the tool from here: [macOCR](https://github.com/glowinthedark/macOCR)
