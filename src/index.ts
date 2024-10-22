@@ -5,9 +5,9 @@ import { ocrWithAppleEngine } from './ocr/apple.js';
 import { SubstractOptions } from './types.js';
 import { createTempDir } from './utils/io.js';
 import logger from './utils/logger.js';
-import { filterOutDuplicates } from './utils/postProcessing.js';
+import { filterOutDuplicateFrames, filterOutDuplicates } from './utils/postProcessing.js';
 
-export const substract = async (videoFile: string, options: SubstractOptions): Promise<string> => {
+export const substract = async (videoFile: string, options: SubstractOptions): Promise<null | string> => {
     const outputFolder = await createTempDir();
     logger.info(`Using temp folder to: ${outputFolder} to process ${videoFile}`);
 
@@ -18,10 +18,10 @@ export const substract = async (videoFile: string, options: SubstractOptions): P
             await options.callbacks?.onGenerateFramesStarted(videoFile);
         }
 
-        const frames = await getFrames(videoFile, {
+        let frames = await getFrames(videoFile, {
             cropOptions: { bottom: 10, top: 30 },
             frequency: 10,
-            outputFolder,
+            outputFolder: outputFolder,
             ...options.frameOptions,
         });
 
@@ -29,9 +29,19 @@ export const substract = async (videoFile: string, options: SubstractOptions): P
             await options.callbacks?.onGenerateFramesFinished(frames);
         }
 
-        logger.info(`${frames.length} frames generated...`);
+        if (frames.length === 0) {
+            logger.warn(`${frames.length} frames generated, aborting...`);
+            return null;
+        }
+
+        logger.info(`${frames.length} frames generated, starting image comparisons for duplication...`);
+
+        frames = await filterOutDuplicateFrames(frames);
+
+        logger.info(`Filtered down to ${frames.length} frames, starting OCR...`);
 
         let result = await ocrWithAppleEngine(frames, {
+            binaryPath: options.ocrOptions?.appleBinaryPath as string,
             callbacks: options.callbacks,
             concurrency: options.concurrency,
         });

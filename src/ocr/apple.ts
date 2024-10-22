@@ -18,7 +18,7 @@ export const ocrWithAppleEngine = async (frames: Frame[], options: AppleOcrOptio
     const ocrPromises = frames.map((frame, i) =>
         limit(async () => {
             try {
-                const { stderr, stdout } = await execFileAsync('bin/OCR-macOS-Apple-Silicon-arm64', [
+                const { stderr, stdout } = await execFileAsync(options.binaryPath, [
                     'en',
                     'false',
                     'false',

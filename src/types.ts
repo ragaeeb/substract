@@ -32,8 +32,13 @@ export type FrameOptions = {
 };
 
 export type AppleOcrOptions = {
+    binaryPath: string;
     callbacks?: OcrCallbacks;
     concurrency?: number;
+};
+
+export type OCROptions = {
+    appleBinaryPath: string;
 };
 
 export interface SubstractOptions {
@@ -41,5 +46,6 @@ export interface SubstractOptions {
     concurrency?: number;
     duplicateTextThreshold?: number;
     frameOptions?: FrameOptions;
+    ocrOptions: OCROptions;
     outputOptions: OutputOptions;
 }

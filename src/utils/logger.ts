@@ -1,9 +1,21 @@
+/* eslint-disable no-undef */
+
 import pino, { Logger } from 'pino';
 import process from 'process';
 
-const logger: Logger = pino({
+let logger: Logger = pino({
     base: { hostname: undefined, pid: undefined }, // This will remove pid and hostname but keep time
-    level: process.env.LOG_LEVEL || 'info',
+    level: process.env.LOG_LEVEL || 'debug',
 });
+
+if (process.env.NODE_ENV === 'test') {
+    logger = {
+        debug: console.debug,
+        error: console.error,
+        fatal: console.error,
+        info: console.info,
+        level: 'debug',
+    } as Logger;
+}
 
 export default logger;
