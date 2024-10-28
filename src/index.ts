@@ -60,3 +60,6 @@ export const substract = async (videoFile: string, options: SubstractOptions): P
         await fs.rm(outputFolder, { recursive: true });
     }
 };
+
+export * from './types';
+export type { CropOptions, CropPreset, Frame } from 'ffmpeg-simplified';
