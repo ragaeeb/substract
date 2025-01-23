@@ -1,4 +1,5 @@
-import { Frame } from 'ffmpeg-simplified';
+import type { Frame } from 'ffmpeg-simplified';
+
 import { stringSimilarity } from 'string-similarity-js';
 
 import { OcrResult } from '../types';

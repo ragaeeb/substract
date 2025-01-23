@@ -5,32 +5,32 @@
 ![GitHub License](https://img.shields.io/github/license/ragaeeb/substract)
 ![GitHub Release](https://img.shields.io/github/v/release/ragaeeb/substract)
 [![codecov](https://codecov.io/gh/ragaeeb/substract/graph/badge.svg?token=86P2IF7F3Y)](https://codecov.io/gh/ragaeeb/substract)
-[![Size](https://deno.bundlejs.com/badge?q=substract@1.0.0&badge=detailed)](https://bundlejs.com/?q=substract%401.0.0)
+[![Size](https://deno.bundlejs.com/badge?q=substract@1.0.2&badge=detailed)](https://bundlejs.com/?q=substract%401.0.2)
 ![typescript](https://badgen.net/badge/icon/typescript?icon=typescript&label&color=blue)
 
 `Substract` is a **Node.js library** designed to **extract hard-coded subtitles** from videos efficiently. Leveraging powerful tools like **FFmpeg**, **Apple's OCR engine**, and **parallel processing**, Substract provides a seamless way to retrieve subtitles embedded directly within video files.
 
 ## Table of Contents
 
--   [Features](#features)
--   [Installation](#installation)
--   [Usage](#usage)
--   [API Reference](#api-reference)
-    -   [substract](#substract)
--   [Options](#options)
-    -   [SubstractOptions](#substractoptions)
--   [Callbacks](#callbacks)
--   [License](#license)
+- [Features](#features)
+- [Installation](#installation)
+- [Usage](#usage)
+- [API Reference](#api-reference)
+    - [substract](#substract)
+- [Options](#options)
+    - [SubstractOptions](#substractoptions)
+- [Callbacks](#callbacks)
+- [License](#license)
 
 # Features
 
--   **Efficient Frame Extraction**: Extract frames from videos at specified intervals.
--   **Duplicate Frame Filtering**: Remove similar or consecutive duplicate frames to optimize processing.
--   **OCR Integration**: Utilize Apple's OCR engine for accurate text recognition.
--   **Concurrency Control**: Manage the number of concurrent OCR processes to balance performance and resource usage.
--   **Customizable Options**: Tailor the extraction process with various configuration options.
--   **Comprehensive Callbacks**: Hook into different stages of the extraction process for enhanced control and monitoring.
--   **100% Test Coverage**: Robust unit tests ensure reliability and stability.
+- **Efficient Frame Extraction**: Extract frames from videos at specified intervals.
+- **Duplicate Frame Filtering**: Remove similar or consecutive duplicate frames to optimize processing.
+- **OCR Integration**: Utilize Apple's OCR engine for accurate text recognition.
+- **Concurrency Control**: Manage the number of concurrent OCR processes to balance performance and resource usage.
+- **Customizable Options**: Tailor the extraction process with various configuration options.
+- **Comprehensive Callbacks**: Hook into different stages of the extraction process for enhanced control and monitoring.
+- **100% Test Coverage**: Robust unit tests ensure reliability and stability.
 
 ## Installation
 
@@ -112,16 +112,16 @@ Extracts hard-coded subtitles from a video file.
 
 #### Parameters
 
--   **`videoFile`**: `string`  
-    Path to the video file from which to extract subtitles.
+- **`videoFile`**: `string`  
+  Path to the video file from which to extract subtitles.
 
--   **`options`**: `SubstractOptions`  
-    Configuration options for the extraction process.
+- **`options`**: `SubstractOptions`  
+  Configuration options for the extraction process.
 
 #### Returns
 
--   `Promise<null | string>`  
-    Resolves to the path of the output JSON file containing OCR results if successful, or `null` if no frames were generated.
+- `Promise<null | string>`  
+  Resolves to the path of the output JSON file containing OCR results if successful, or `null` if no frames were generated.
 
 ## Options
 

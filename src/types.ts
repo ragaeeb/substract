@@ -1,8 +1,21 @@
 import { CropOptions, Frame } from 'ffmpeg-simplified';
 
-export type OcrResult = {
-    start: number;
-    text: string;
+export enum OutputFormat {
+    Json = 'json',
+    Txt = 'txt',
+}
+
+export type AppleOcrOptions = {
+    binaryPath: string;
+    callbacks?: OcrCallbacks;
+    concurrency?: number;
+};
+
+export interface Callbacks extends GenerateFramesCallbacks, OcrCallbacks {}
+
+export type FrameOptions = {
+    cropOptions?: CropOptions;
+    frequency?: number;
 };
 
 export interface GenerateFramesCallbacks {
@@ -16,31 +29,18 @@ export interface OcrCallbacks {
     onOcrStarted?: (frames: Frame[]) => Promise<void>;
 }
 
-export interface Callbacks extends GenerateFramesCallbacks, OcrCallbacks {}
+export type OCROptions = {
+    appleBinaryPath: string;
+};
 
-export enum OutputFormat {
-    Json = 'json',
-    Txt = 'txt',
-}
+export type OcrResult = {
+    start: number;
+    text: string;
+};
 
 export interface OutputOptions {
     outputFile: string;
 }
-
-export type FrameOptions = {
-    cropOptions?: CropOptions;
-    frequency?: number;
-};
-
-export type AppleOcrOptions = {
-    binaryPath: string;
-    callbacks?: OcrCallbacks;
-    concurrency?: number;
-};
-
-export type OCROptions = {
-    appleBinaryPath: string;
-};
 
 export interface SubstractOptions {
     callbacks?: Callbacks;

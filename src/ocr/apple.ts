@@ -1,4 +1,5 @@
-import { Frame } from 'ffmpeg-simplified';
+import type { Frame } from 'ffmpeg-simplified';
+
 import { execFile } from 'node:child_process';
 import util from 'node:util';
 import pLimit from 'p-limit';
