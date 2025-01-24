@@ -20,8 +20,7 @@ export const substract = async (videoFile: string, options: SubstractOptions): P
         }
 
         let frames = await getFrames(videoFile, {
-            cropOptions: { bottom: 10, top: 30 },
-            frequency: 10,
+            frequency: 5,
             outputFolder: outputFolder,
             ...options.frameOptions,
         });
