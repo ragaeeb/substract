@@ -5,13 +5,18 @@ on:
         branches:
             - main
 
+# Least-privilege default for the workflow; job overrides as needed
+permissions:
+  contents: read
+
 jobs:
     semantic-release:
         runs-on: ubuntu-latest
         permissions:
             contents: write
             issues: write
-            pull-requests: none
+            pull-requests: write
+            id-token: write
         steps:
             - uses: actions/checkout@v7
               with:
@@ -24,12 +29,14 @@ jobs:
               uses: oven-sh/setup-bun@v2
               with:
                   bun-version: latest
+
             - name: Install dependencies
               run: bun install --frozen-lockfile
             - name: Set up FFmpeg
               uses: AnimMouse/setup-ffmpeg@v1.2.5
               with:
                   version: release
+
             - run: ffmpeg -version
             - run: bun run typecheck
             - run: bun run lint
@@ -39,4 +46,3 @@ jobs:
             - run: bun x --no-install semantic-release
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                  NPM_TOKEN: ${{ secrets.PUBLISH_NPM_TOKEN }}
