@@ -1,7 +1,5 @@
-/* eslint-disable no-undef */
-
-import pino, { Logger } from 'pino';
-import process from 'process';
+import process from 'node:process';
+import pino, { type Logger } from 'pino';
 
 let logger: Logger = pino({
     base: { hostname: undefined, pid: undefined }, // This will remove pid and hostname but keep time

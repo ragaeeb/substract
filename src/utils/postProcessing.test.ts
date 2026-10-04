@@ -30,11 +30,11 @@ describe('postProcessing', () => {
                 { start: 2, text: 'Vitest Rocks!' },
             ];
 
-            const result = filterOutDuplicates(ocrResults);
+            const result = filterOutDuplicates(ocrResults, 0.75);
             expect(result).toEqual(ocrResults);
         });
 
-        it('should filter out consecutive similar strings based on default threshold', () => {
+        it('filters consecutive similar strings when fuzzy deduplication is requested', () => {
             const ocrResults = [
                 { start: 0, text: 'Subtitle line one.' },
                 { start: 1, text: 'Subtitle line one..' },
@@ -42,7 +42,7 @@ describe('postProcessing', () => {
                 { start: 3, text: 'Subtitle line two.' },
             ];
 
-            const result = filterOutDuplicates(ocrResults);
+            const result = filterOutDuplicates(ocrResults, 0.9);
 
             expect(result).toEqual([
                 { start: 0, text: 'Subtitle line one.' },
@@ -100,7 +100,7 @@ describe('postProcessing', () => {
                 { start: 3, text: 'This is a test.' }, // Similar to the first
             ];
 
-            const result = filterOutDuplicates(ocrResults);
+            const result = filterOutDuplicates(ocrResults, 0.75);
 
             expect(result).toEqual([
                 { start: 0, text: 'This is a test.' },
@@ -119,6 +119,17 @@ describe('postProcessing', () => {
             const result = filterOutDuplicates(ocrResults, 1);
 
             expect(result).toEqual([{ start: 0, text: 'Unique text' }]);
+        });
+
+        it('retains changed numbers and negation, and identical captions separated by a blank frame', () => {
+            const results = [
+                { start: 0, text: 'We have 10 books and we can read them.' },
+                { start: 1, text: 'We have 11 books and we can read them.' },
+                { start: 2, text: 'We have 11 books and we cannot read them.' },
+                { start: 3, text: '' },
+                { start: 4, text: 'We have 11 books and we cannot read them.' },
+            ];
+            expect(filterOutDuplicates(results)).toEqual([results[0], results[1], results[2], results[4]]);
         });
 
         it('should not filter out similar but non-consecutive texts', () => {

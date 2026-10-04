@@ -1,19 +1,19 @@
-import { getFrames } from 'ffmpeg-simplified';
-import { promises as fs } from 'fs';
-import { afterEach, beforeEach, describe, expect, it, Mock, vi } from 'vitest';
+import { promises as fs } from 'node:fs';
+import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 
 import { substract } from './index.js';
 import { ocrWithAppleEngine } from './ocr/apple.js';
+import { getFrames } from './utils/frames.js';
 import { createTempDir } from './utils/io.js';
-import { filterOutDuplicateFrames, filterOutDuplicates } from './utils/postProcessing.js';
+import { filterOutDuplicates } from './utils/postProcessing.js';
 
-vi.mock('ffmpeg-simplified');
+vi.mock('./utils/frames.js');
 vi.mock('./ocr/apple.js');
 vi.mock('./utils/postProcessing.js');
 
 describe('index', () => {
     describe('substract', () => {
-        let outputFolder;
+        let outputFolder: string;
 
         beforeEach(async () => {
             vi.resetAllMocks();
@@ -26,17 +26,11 @@ describe('index', () => {
 
         it('should extract out the subtitles', async () => {
             (getFrames as Mock).mockResolvedValue([
-                { filePath: 'frame1.jpg', start: 0 },
-                { filePath: 'frame1.5.jpg', start: 5 },
-                { filePath: 'frame2.jpg', start: 10 },
-                { filePath: 'frame3.jpg', start: 20 },
-                { filePath: 'frame4.jpg', start: 30 },
-            ]);
-
-            (filterOutDuplicateFrames as Mock).mockResolvedValue([
-                { filePath: 'frame1.jpg', start: 0 },
-                { filePath: 'frame2.jpg', start: 10 },
-                { filePath: 'frame3.jpg', start: 20 },
+                { filename: 'frame1.jpg', start: 0 },
+                { filename: 'frame1.5.jpg', start: 5 },
+                { filename: 'frame2.jpg', start: 10 },
+                { filename: 'frame3.jpg', start: 20 },
+                { filename: 'frame4.jpg', start: 30 },
             ]);
 
             (ocrWithAppleEngine as Mock).mockResolvedValue([
@@ -69,11 +63,6 @@ describe('index', () => {
 
         it('should trigger callbacks correctly', async () => {
             (getFrames as Mock).mockResolvedValue([
-                { filename: 'frame1.jpg', start: 0 },
-                { filename: 'frame2.jpg', start: 10 },
-            ]);
-
-            (filterOutDuplicateFrames as Mock).mockResolvedValue([
                 { filename: 'frame1.jpg', start: 0 },
                 { filename: 'frame2.jpg', start: 10 },
             ]);
@@ -145,7 +134,6 @@ describe('index', () => {
 
         it('should use provided frameOptions', async () => {
             (getFrames as Mock).mockResolvedValue([{ filename: 'frame1.jpg', start: 0 }]);
-            (filterOutDuplicateFrames as Mock).mockResolvedValue([{ filename: 'frame1.jpg', start: 0 }]);
             (ocrWithAppleEngine as Mock).mockResolvedValue([{ start: 0, text: 'Hello world' }]);
             (filterOutDuplicates as Mock).mockReturnValue([{ start: 0, text: 'Hello world' }]);
 
@@ -171,10 +159,8 @@ describe('index', () => {
             });
         });
 
-        it('should pass concurrency option to ocrWithAppleEngine', async () => {
+        it('forwards concurrency and OCR filtering options to ocrWithAppleEngine', async () => {
             (getFrames as Mock).mockResolvedValue([{ filename: 'frame1.jpg', start: 0 }]);
-
-            (filterOutDuplicateFrames as Mock).mockResolvedValue([{ filename: 'frame1.jpg', start: 0 }]);
 
             (ocrWithAppleEngine as Mock).mockResolvedValue([{ start: 0, text: 'Hello world' }]);
 
@@ -186,7 +172,13 @@ describe('index', () => {
 
             const result = (await substract(`${outputFolder}/video.mp4`, {
                 concurrency,
-                ocrOptions: { appleBinaryPath: '/path/to/ocr/binary' },
+                ocrOptions: {
+                    appleBinaryPath: '/path/to/ocr/binary',
+                    format: 'json',
+                    languages: ['en', 'ar'],
+                    timeoutMs: 12_000,
+                },
+                subtitleOptions: { filterPersistentText: false, maxLineHeight: 0.2 },
                 outputOptions: { outputFile },
             })) as string;
 
@@ -195,17 +187,16 @@ describe('index', () => {
             expect(ocrWithAppleEngine).toHaveBeenCalledWith([{ filename: 'frame1.jpg', start: 0 }], {
                 binaryPath: '/path/to/ocr/binary',
                 callbacks: undefined,
-                concurrency: concurrency,
+                concurrency,
+                format: 'json',
+                languages: ['en', 'ar'],
+                subtitleOptions: { filterPersistentText: false, maxLineHeight: 0.2 },
+                timeoutMs: 12_000,
             });
         });
 
         it('should use duplicateTextThreshold in filterOutDuplicates', async () => {
             (getFrames as Mock).mockResolvedValue([
-                { filename: 'frame1.jpg', start: 0 },
-                { filename: 'frame2.jpg', start: 10 },
-            ]);
-
-            (filterOutDuplicateFrames as Mock).mockResolvedValue([
                 { filename: 'frame1.jpg', start: 0 },
                 { filename: 'frame2.jpg', start: 10 },
             ]);

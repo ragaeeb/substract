@@ -1,7 +1,7 @@
-import fs from 'fs/promises';
+import fs from 'node:fs/promises';
 import path from 'node:path';
 
-import { OcrResult, OutputFormat, OutputOptions } from '../types.js';
+import { type OcrResult, OutputFormat, type OutputOptions } from '../types.js';
 import logger from './logger.js';
 
 const mapDataToJSONString = (segments: OcrResult[]): string => {

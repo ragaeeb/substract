@@ -1,4 +1,4 @@
-name: Node.js CI
+name: Bun CI
 
 on:
     push:
@@ -11,26 +11,31 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v7
               with:
                   fetch-depth: 0
 
-            - name: Use Node.js 22.x
-              uses: actions/setup-node@v4
+            - name: Use Node.js 26
+              uses: actions/setup-node@v7
               with:
-                  node-version: 22.x
-            - name: Enable Corepack
-              run: corepack enable
-            - run: pnpm install --frozen-lockfile
-            - uses: federicocarboni/setup-ffmpeg@v3
-              id: setup-ffmpeg
+                  node-version: '26'
+            - name: Set up Bun
+              uses: oven-sh/setup-bun@v2
               with:
-                  ffmpeg-version: release
-                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  bun-version: latest
+            - name: Install dependencies
+              run: bun install --frozen-lockfile
+            - name: Set up FFmpeg
+              uses: AnimMouse/setup-ffmpeg@v1.2.5
+              with:
+                  version: release
             - run: ffmpeg -version
-            - run: pnpm run build
-            - run: pnpm run test
+            - run: bun run build
+            - run: bun run typecheck
+            - run: bun run lint
+            - run: bun run test
+            - run: bun run test:e2e
             - name: Upload results to Codecov
-              uses: codecov/codecov-action@v4
+              uses: codecov/codecov-action@v7
               with:
                   token: ${{ secrets.CODECOV_TOKEN }}

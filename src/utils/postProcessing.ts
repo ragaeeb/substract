@@ -1,8 +1,5 @@
-import type { Frame } from 'ffmpeg-simplified';
-
 import { stringSimilarity } from 'string-similarity-js';
-
-import { OcrResult } from '../types';
+import type { Frame, OcrResult } from '../types';
 import { TEXT_COMPARISON_SENSITIVITY } from './constants';
 import { areImagesSimilar } from './imageUtils';
 
@@ -10,17 +7,22 @@ export const filterOutDuplicates = (
     ocrResults: OcrResult[],
     threshold: number = TEXT_COMPARISON_SENSITIVITY,
 ): OcrResult[] => {
-    if (ocrResults.length === 0) {
-        return [];
-    }
-
-    const filtered: OcrResult[] = [ocrResults[0]];
-
-    for (let i = 1; i < ocrResults.length; i++) {
-        const ocrResult = ocrResults[i];
-
-        if (stringSimilarity(ocrResults[i].text, ocrResults[i - 1].text) < threshold) {
-            filtered.push(ocrResult);
+    if (!Number.isFinite(threshold) || threshold < 0 || threshold > 1)
+        throw new Error('Duplicate threshold must be in [0, 1]');
+    const filtered: OcrResult[] = [];
+    let previous: string | undefined;
+    for (const result of ocrResults) {
+        const text = result.text.trim().replace(/\s+/g, ' ');
+        if (!text) {
+            previous = undefined;
+            continue;
+        }
+        if (
+            previous === undefined ||
+            (threshold === 1 ? text !== previous : stringSimilarity(text, previous) < threshold)
+        ) {
+            filtered.push({ ...result, text });
+            previous = text;
         }
     }
 
