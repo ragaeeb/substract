@@ -1,6 +1,6 @@
 import { Buffer } from 'node:buffer';
 import pixelmatch from 'pixelmatch';
-import sharp from 'sharp';
+import sharp, { type OutputInfo } from 'sharp';
 
 import { PIXEL_COMPARISON_SENSITIVITY, PIXEL_DIFFERENCE_THRESHOLD_PERCENTAGE } from './constants';
 
@@ -8,7 +8,7 @@ const mapImageToBuffer = (
     image: string,
 ): Promise<{
     data: Buffer;
-    info: sharp.OutputInfo;
+    info: OutputInfo;
 }> => sharp(image).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
 
 type ImageSimilarityOptions = {

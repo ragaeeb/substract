@@ -1,14 +1,17 @@
-import { getFrames } from 'ffmpeg-simplified';
-import { promises as fs } from 'fs';
+import { promises as fs } from 'node:fs';
 
 import { ocrWithAppleEngine } from './ocr/apple.js';
-import { SubstractOptions } from './types.js';
+import type { SubstractOptions } from './types.js';
+import { getFrames } from './utils/frames.js';
 import { createTempDir } from './utils/io.js';
 import logger from './utils/logger.js';
 import { writeOcrResults } from './utils/outputWriter.js';
-import { filterOutDuplicateFrames, filterOutDuplicates } from './utils/postProcessing.js';
+import { filterOutDuplicates } from './utils/postProcessing.js';
 
 export const substract = async (videoFile: string, options: SubstractOptions): Promise<null | string> => {
+    if (!Number.isFinite(options.frameOptions?.frequency ?? 1) || (options.frameOptions?.frequency ?? 1) <= 0) {
+        throw new Error('Frame frequency must be positive');
+    }
     const outputFolder = await createTempDir();
     logger.info(`Using temp folder to: ${outputFolder} to process ${videoFile}`);
 
@@ -19,8 +22,8 @@ export const substract = async (videoFile: string, options: SubstractOptions): P
             await options.callbacks?.onGenerateFramesStarted(videoFile);
         }
 
-        let frames = await getFrames(videoFile, {
-            frequency: 5,
+        const frames = await getFrames(videoFile, {
+            frequency: 1,
             outputFolder: outputFolder,
             ...options.frameOptions,
         });
@@ -34,20 +37,20 @@ export const substract = async (videoFile: string, options: SubstractOptions): P
             return null;
         }
 
-        logger.info(`${frames.length} frames generated, starting image comparisons for duplication...`);
-
-        frames = await filterOutDuplicateFrames(frames);
-
-        logger.info(`Filtered down to ${frames.length} frames, starting OCR...`);
+        logger.info(`${frames.length} frames generated, starting OCR...`);
 
         let result = await ocrWithAppleEngine(frames, {
             binaryPath: options.ocrOptions?.appleBinaryPath as string,
             callbacks: options.callbacks,
             concurrency: options.concurrency,
+            format: options.ocrOptions.format,
+            languages: options.ocrOptions.languages,
+            subtitleOptions: options.subtitleOptions,
+            timeoutMs: options.ocrOptions.timeoutMs,
         });
 
         if (options.callbacks?.onOcrFinished) {
-            options.callbacks?.onOcrFinished(result);
+            options.callbacks?.onOcrFinished(result.filter((frame) => frame.text));
         }
 
         result = filterOutDuplicates(result, options.duplicateTextThreshold);
@@ -60,5 +63,5 @@ export const substract = async (videoFile: string, options: SubstractOptions): P
     }
 };
 
+export type { CropPreset } from './types';
 export * from './types';
-export type { CropOptions, CropPreset, Frame } from 'ffmpeg-simplified';

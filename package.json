@@ -1,31 +1,31 @@
 {
     "name": "substract",
-    "version": "1.0.2",
+    "version": "1.1.0",
     "description": "A NodeJS library for extracting hard-coded subtitles from within videos.",
-    "main": "dist/main.js",
-    "types": "dist/index.d.ts",
-    "source": "src/index.ts",
+    "main": "dist/index.mjs",
+    "types": "dist/index.d.mts",
     "type": "module",
     "scripts": {
-        "build": "parcel build",
-        "test": "vitest run --coverage"
+        "build": "tsdown",
+        "typecheck": "tsc --noEmit",
+        "lint": "biome ci .",
+        "format": "biome check --write .",
+        "evaluate:corpus": "tsx testing/evaluate-corpus.ts",
+        "test": "vitest run --coverage",
+        "test:e2e": "vitest run --config vitest.e2e.config.ts"
     },
     "files": [
-        "dist/main.js",
-        "dist/main.js.map",
-        "dist/*.d.ts"
+        "dist"
     ],
     "dependencies": {
-        "ffmpeg-simplified": "^2.0.0",
-        "p-limit": "^6.2.0",
-        "p-queue": "^8.1.0",
-        "pino": "^9.6.0",
-        "pixelmatch": "^6.0.0",
-        "sharp": "^0.33.5",
+        "p-limit": "^7.3.3",
+        "pino": "^10.4.0",
+        "pixelmatch": "^7.2.0",
+        "sharp": "^0.35.5",
         "string-similarity-js": "^2.1.4"
     },
     "engines": {
-        "node": ">=22.0.0"
+        "node": ">=22.18.0"
     },
     "keywords": [
         "srt",
@@ -37,26 +37,14 @@
     "author": "Ragaeeb Haq",
     "license": "MIT",
     "devDependencies": {
-        "@eslint/js": "^9.18.0",
-        "@parcel/packager-ts": "^2.13.3",
-        "@parcel/transformer-typescript-types": "^2.13.3",
-        "@semantic-release/changelog": "^6.0.3",
-        "@types/eslint__js": "^8.42.3",
-        "@types/node": "^22.10.10",
-        "@types/pixelmatch": "^5.2.6",
-        "@vitest/coverage-v8": "^3.0.4",
-        "eslint": "^9.18.0",
-        "eslint-config-prettier": "^10.0.1",
-        "eslint-plugin-import": "^2.31.0",
-        "eslint-plugin-perfectionist": "^4.7.0",
-        "eslint-plugin-prettier": "^5.2.3",
-        "eslint-plugin-vitest": "^0.5.4",
-        "eslint-plugin-vitest-globals": "^1.5.0",
-        "parcel": "^2.13.3",
-        "prettier": "^3.4.2",
-        "semantic-release": "^24.2.1",
-        "typescript": "^5.7.3",
-        "typescript-eslint": "^8.21.0",
-        "vitest": "^3.0.4"
+        "@semantic-release/changelog": "^7.0.0",
+        "@types/node": "^26.6.4",
+        "@vitest/coverage-v8": "^5.0.3",
+        "semantic-release": "^25.0.9",
+        "typescript": "^7.0.2",
+        "vitest": "^5.0.3",
+        "@biomejs/biome": "2.5.15",
+        "tsdown": "^0.23.0",
+        "tsx": "^4.23.15"
     }
 }

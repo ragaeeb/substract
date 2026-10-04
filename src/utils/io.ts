@@ -1,6 +1,6 @@
-import { promises as fs } from 'fs';
-import os from 'os';
-import path from 'path';
+import { promises as fs } from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 
 export const createTempDir = async () => {
     const tempDirBase = path.join(os.tmpdir(), `substract_${Date.now().toString()}`);

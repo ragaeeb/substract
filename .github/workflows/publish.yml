@@ -19,7 +19,7 @@ jobs:
                   persist-credentials: true
             - uses: actions/setup-node@v4
               with:
-                  node-version: 22.x
+                  node-version: 22.18.0
             - name: Enable Corepack
               run: corepack enable
             - run: pnpm install --frozen-lockfile
@@ -29,7 +29,10 @@ jobs:
                   ffmpeg-version: release
                   github-token: ${{ secrets.GITHUB_TOKEN }}
             - run: ffmpeg -version
+            - run: pnpm run typecheck
+            - run: pnpm run lint
             - run: pnpm run test
+            - run: pnpm run test:e2e
             - run: pnpm run build
             - run: pnpm exec semantic-release
               env:
