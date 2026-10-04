@@ -159,7 +159,7 @@ describe('index', () => {
             });
         });
 
-        it('should pass concurrency option to ocrWithAppleEngine', async () => {
+        it('forwards concurrency and OCR filtering options to ocrWithAppleEngine', async () => {
             (getFrames as Mock).mockResolvedValue([{ filename: 'frame1.jpg', start: 0 }]);
 
             (ocrWithAppleEngine as Mock).mockResolvedValue([{ start: 0, text: 'Hello world' }]);
@@ -172,7 +172,13 @@ describe('index', () => {
 
             const result = (await substract(`${outputFolder}/video.mp4`, {
                 concurrency,
-                ocrOptions: { appleBinaryPath: '/path/to/ocr/binary' },
+                ocrOptions: {
+                    appleBinaryPath: '/path/to/ocr/binary',
+                    format: 'json',
+                    languages: ['en', 'ar'],
+                    timeoutMs: 12_000,
+                },
+                subtitleOptions: { filterPersistentText: false, maxLineHeight: 0.2 },
                 outputOptions: { outputFile },
             })) as string;
 
@@ -181,7 +187,11 @@ describe('index', () => {
             expect(ocrWithAppleEngine).toHaveBeenCalledWith([{ filename: 'frame1.jpg', start: 0 }], {
                 binaryPath: '/path/to/ocr/binary',
                 callbacks: undefined,
-                concurrency: concurrency,
+                concurrency,
+                format: 'json',
+                languages: ['en', 'ar'],
+                subtitleOptions: { filterPersistentText: false, maxLineHeight: 0.2 },
+                timeoutMs: 12_000,
             });
         });
 

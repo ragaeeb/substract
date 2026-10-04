@@ -52,7 +52,6 @@ export const parseAppleOcr = (document: unknown): OcrLine[] => {
 };
 
 export const ocrWithAppleEngine = async (frames: Frame[], options: AppleOcrOptions): Promise<OcrResult[]> => {
-    const limit = pLimit(options.concurrency ?? 5);
     if (!options.binaryPath) throw new Error('appleBinaryPath is required');
     if (options.format !== undefined && options.format !== 'json' && options.format !== 'legacy') {
         throw new Error('Unknown OCR format');
@@ -70,6 +69,12 @@ export const ocrWithAppleEngine = async (frames: Frame[], options: AppleOcrOptio
     if (options.format === 'legacy' && options.subtitleOptions !== undefined && options.subtitleOptions !== false) {
         throw new Error('Watermark filtering requires macOCR JSON bounding boxes');
     }
+
+    const concurrency = options.concurrency ?? 5;
+    if (!Number.isInteger(concurrency) || concurrency <= 0) {
+        throw new Error('OCR concurrency must be a positive integer');
+    }
+    const limit = pLimit(concurrency);
 
     if (options.callbacks?.onOcrStarted) {
         await options.callbacks?.onOcrStarted(frames);

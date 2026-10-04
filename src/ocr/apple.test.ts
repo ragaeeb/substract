@@ -2,7 +2,7 @@ import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import process from 'node:process';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ocrWithAppleEngine } from './apple';
 
@@ -28,6 +28,18 @@ else console.log(data.observations.map(line => line.text).join('\\n'));
     });
     afterEach(async () => {
         await rm(folder, { force: true, recursive: true });
+    });
+
+    it.each([0, -1, 1.5, NaN, Infinity])('rejects invalid concurrency %s before starting OCR', async (concurrency) => {
+        const onOcrStarted = vi.fn();
+        await expect(
+            ocrWithAppleEngine([], {
+                binaryPath: binary,
+                callbacks: { onOcrStarted },
+                concurrency,
+            }),
+        ).rejects.toThrow('OCR concurrency must be a positive integer');
+        expect(onOcrStarted).not.toHaveBeenCalled();
     });
 
     it('removes isolated corner branding, orders captions, and retains a long-held question', async () => {
