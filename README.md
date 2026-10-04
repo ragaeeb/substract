@@ -34,7 +34,7 @@
 
 ## Installation
 
-Ensure you have **Node.js v22.18.0** or higher installed.
+Ensure you have **Node.js v26.0.0** or higher installed.
 
 ```bash
 npm install substract
